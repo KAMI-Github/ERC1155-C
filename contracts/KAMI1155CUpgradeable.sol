@@ -188,8 +188,8 @@ contract KAMI1155CUpgradeable is
         require(newRoyaltyPercentage <= 3000, "Royalty percentage too high");
         
         royaltyPercentage = newRoyaltyPercentage;
-        // Update default royalty for ERC2981 using the first transfer receiver if available, else address(0)
-        address defaultReceiver = _transferRoyaltyReceivers.length > 0 ? _transferRoyaltyReceivers[0].receiver : address(0);
+        // Update default royalty for ERC2981 using the first transfer receiver if available, else platform address
+        address defaultReceiver = _transferRoyaltyReceivers.length > 0 ? _transferRoyaltyReceivers[0].receiver : platformAddress;
         _setDefaultRoyalty(defaultReceiver, newRoyaltyPercentage);
         emit RoyaltyPercentageUpdated(newRoyaltyPercentage);
     }

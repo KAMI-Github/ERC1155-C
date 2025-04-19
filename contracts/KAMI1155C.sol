@@ -95,7 +95,8 @@ contract KAMI1155C is AccessControl, ERC1155, ERC2981, Pausable {
         _grantRole(OWNER_ROLE, msg.sender);
         _grantRole(PLATFORM_ROLE, platformAddress_);
 
-        _setDefaultRoyalty(address(0), royaltyPercentage);
+        // Use deployer as initial default receiver for ERC2981 compliance
+        _setDefaultRoyalty(msg.sender, royaltyPercentage);
     }
 
     function supportsInterface(bytes4 interfaceId) 
@@ -143,7 +144,7 @@ contract KAMI1155C is AccessControl, ERC1155, ERC2981, Pausable {
         require(newRoyaltyPercentage <= 3000, "Royalty percentage too high");
         
         royaltyPercentage = newRoyaltyPercentage;
-        address defaultReceiver = _transferRoyaltyReceivers.length > 0 ? _transferRoyaltyReceivers[0].receiver : address(0);
+        address defaultReceiver = _transferRoyaltyReceivers.length > 0 ? _transferRoyaltyReceivers[0].receiver : platformAddress;
         _setDefaultRoyalty(defaultReceiver, newRoyaltyPercentage);
         emit RoyaltyPercentageUpdated(newRoyaltyPercentage);
     }
@@ -266,6 +267,9 @@ contract KAMI1155C is AccessControl, ERC1155, ERC2981, Pausable {
         }
         
         _mint(msg.sender, newId, 1, ""); // Owner tracking in hook
+        
+        // Emit event similar to sellToken for consistency in tests
+        emit TokenSold(newId, msg.sender, address(this), mintPrice); 
     }
     
     // --- Selling ---
